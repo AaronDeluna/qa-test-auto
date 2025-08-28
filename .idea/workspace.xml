@@ -5,21 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2432cf90-bc1a-47e8-ad66-efe7210d9ad5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/checkstyle-idea.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/api/auth/AuthenticationTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/common/Specification.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/dto/AuthenticationResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/dto/CandidateRegistration.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/dto/EmployerRegistrationRequestDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/dto/ErrorResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/utils/DataGeneration.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/api/auth/CandidateAuthTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/api/auth/EmployerAuthTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/common/BaseApiTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/api/auth/AuthenticationTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/utils/DataGeneration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/data/TestDataFactory.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,10 +41,17 @@
     "JUnit.AuthenticationTest.executor": "Run",
     "JUnit.AuthenticationTest.shouldReturn400WhenEmailIsInvalid (1).executor": "Run",
     "JUnit.AuthenticationTest.shouldReturn400WhenEmailIsInvalid.executor": "Run",
+    "JUnit.AuthenticationTest.shouldReturn400WhenEmployerEmailIsInvalid.executor": "Run",
+    "JUnit.AuthenticationTest.shouldReturn400WhenEmployerPasswordInvalid (1).executor": "Run",
+    "JUnit.AuthenticationTest.shouldReturn400WhenEmployerPasswordInvalid.executor": "Run",
+    "JUnit.AuthenticationTest.shouldReturn400WhenEmployerPhoneInvalid.executor": "Run",
     "JUnit.AuthenticationTest.shouldReturn400WhenPasswordLengthInvalid.executor": "Run",
     "JUnit.AuthenticationTest.shouldReturn409WhenEmailIsExist.executor": "Run",
+    "JUnit.AuthenticationTest.shouldReturn409WhenEmployerEmailIsExist.executor": "Run",
     "JUnit.AuthenticationTest.successCandidateRegistration.executor": "Run",
     "JUnit.AuthenticationTest.successEmployerRegistration.executor": "Run",
+    "JUnit.CandidateAuthTest.shouldReturn400WhenEmailIsInvalid.executor": "Run",
+    "JUnit.CandidateAuthTest.successCandidateRegistration.executor": "Run",
     "Maven.test-qa [clean].executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -72,8 +70,8 @@
       <recent name="$PROJECT_DIR$/src/test" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.AuthenticationTest.successEmployerRegistration">
-    <configuration name="AuthenticationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="JUnit.CandidateAuthTest.successCandidateRegistration">
+    <configuration name="CandidateAuthTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="test-qa" />
       <extension name="coverage">
         <pattern>
@@ -82,13 +80,13 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="api.auth" />
-      <option name="MAIN_CLASS_NAME" value="api.auth.AuthenticationTest" />
+      <option name="MAIN_CLASS_NAME" value="api.auth.CandidateAuthTest" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="AuthenticationTest.shouldReturn400WhenEmailIsInvalid" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CandidateAuthTest.shouldReturn400WhenEmailIsInvalid" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="test-qa" />
       <extension name="coverage">
         <pattern>
@@ -97,14 +95,14 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="api.auth" />
-      <option name="MAIN_CLASS_NAME" value="api.auth.AuthenticationTest" />
+      <option name="MAIN_CLASS_NAME" value="api.auth.CandidateAuthTest" />
       <option name="METHOD_NAME" value="shouldReturn400WhenEmailIsInvalid(java.lang.String)" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="AuthenticationTest.shouldReturn400WhenPasswordLengthInvalid" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CandidateAuthTest.shouldReturn400WhenEmployerPhoneInvalid" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="test-qa" />
       <extension name="coverage">
         <pattern>
@@ -113,14 +111,14 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="api.auth" />
-      <option name="MAIN_CLASS_NAME" value="api.auth.AuthenticationTest" />
-      <option name="METHOD_NAME" value="shouldReturn400WhenPasswordLengthInvalid" />
+      <option name="MAIN_CLASS_NAME" value="api.auth.CandidateAuthTest" />
+      <option name="METHOD_NAME" value="shouldReturn400WhenEmployerPhoneInvalid" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="AuthenticationTest.shouldReturn409WhenEmailIsExist" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CandidateAuthTest.shouldReturn409WhenEmployerEmailIsExist" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="test-qa" />
       <extension name="coverage">
         <pattern>
@@ -129,14 +127,14 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="api.auth" />
-      <option name="MAIN_CLASS_NAME" value="api.auth.AuthenticationTest" />
-      <option name="METHOD_NAME" value="shouldReturn409WhenEmailIsExist" />
+      <option name="MAIN_CLASS_NAME" value="api.auth.CandidateAuthTest" />
+      <option name="METHOD_NAME" value="shouldReturn409WhenEmployerEmailIsExist" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="AuthenticationTest.successEmployerRegistration" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="CandidateAuthTest.successCandidateRegistration" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="test-qa" />
       <extension name="coverage">
         <pattern>
@@ -145,8 +143,8 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="api.auth" />
-      <option name="MAIN_CLASS_NAME" value="api.auth.AuthenticationTest" />
-      <option name="METHOD_NAME" value="successEmployerRegistration" />
+      <option name="MAIN_CLASS_NAME" value="api.auth.CandidateAuthTest" />
+      <option name="METHOD_NAME" value="successCandidateRegistration" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -154,11 +152,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.AuthenticationTest.successEmployerRegistration" />
-        <item itemvalue="JUnit.AuthenticationTest.shouldReturn409WhenEmailIsExist" />
-        <item itemvalue="JUnit.AuthenticationTest.shouldReturn400WhenPasswordLengthInvalid" />
-        <item itemvalue="JUnit.AuthenticationTest" />
-        <item itemvalue="JUnit.AuthenticationTest.shouldReturn400WhenEmailIsInvalid (1)" />
+        <item itemvalue="JUnit.CandidateAuthTest.successCandidateRegistration" />
+        <item itemvalue="JUnit.CandidateAuthTest.shouldReturn400WhenEmailIsInvalid" />
+        <item itemvalue="JUnit.CandidateAuthTest" />
+        <item itemvalue="JUnit.CandidateAuthTest.shouldReturn409WhenEmployerEmailIsExist" />
+        <item itemvalue="JUnit.CandidateAuthTest.shouldReturn400WhenEmployerPhoneInvalid" />
       </list>
     </recent_temporary>
   </component>
@@ -170,7 +168,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1755359847810</updated>
-      <workItem from="1755359849445" duration="18580000" />
+      <workItem from="1755359849445" duration="34425000" />
     </task>
     <servers />
   </component>

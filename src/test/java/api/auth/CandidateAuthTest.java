@@ -1,70 +1,47 @@
 package api.auth;
 
+import common.BaseApiTest;
 import common.Specification;
-import dto.AuthenticationResponse;
+import data.TestDataFactory;
 import dto.CandidateRegistration;
-import dto.EmployerRegistrationRequestDto;
 import dto.ErrorResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.testng.annotations.DataProvider;
-import utils.DataGeneration;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class AuthenticationTest {
+public class CandidateAuthTest extends BaseApiTest {
 
     private static final String CORRECT_PASSWORD_SIZE = "12345678";
     private static final String NOT_CORRECT_PASSWORD_SIZE = "1234";
 
-    @BeforeEach
-    public void iniTestCandidate() {
-        CandidateRegistration candidate = CandidateRegistration.builder()
-                .email("test@mail.ru")
-                .password("12345678")
-                .build();
-
-        given().body(candidate).when().post();
-    }
-
     @Test
-    @DisplayName("Успешная регистрация кандидата")
+    @DisplayName("Кандидат: успешная регистрация (201) — выдаются access/refresh")
     public void successCandidateRegistration() {
         Specification.installSpecification(
                 Specification.requestSpec("auth/candidate"),
                 Specification.responseSpec(201)
         );
 
-        CandidateRegistration candidate = CandidateRegistration.builder()
-                .email(DataGeneration.generateEmail())
-                .password(CORRECT_PASSWORD_SIZE)
-                .build();
-
-        AuthenticationResponse authResponse = given()
-                .body(candidate)
+        given()
+                .body(TestDataFactory.validCandidate("12345678"))
                 .when()
                 .post()
-                .then().log().all()
-                .extract().as(AuthenticationResponse.class);
-
-        assertNotNull(authResponse.getAccessToken());
-        assertNotNull(authResponse.getRefreshToken());
+                .then()
+                .statusCode(201)
+                .log().ifValidationFails()
+                .body("accessToken", notNullValue())
+                .body("refreshToken", notNullValue());
     }
 
-    @ParameterizedTest(name = "invalidEmail")
-    @ValueSource(strings = {
-            "tests@@gmaill.com",
-            "@gmail.com",
-            "tests@.com",
-            "AtestB@.com",
-    })
-    @DisplayName("Ошибка регистрации при некорректном формате почты")
+    @ParameterizedTest(name = "Кандидат: некорректный email → 400 (\"{0}\")")
+    @ValueSource(strings = {"tests@@gmaill.com", "@gmail.com", "tests@.com", "AtestB@.com"})
+    @DisplayName("Кандидат: неверный формат email (400)")
     public void shouldReturn400WhenEmailIsInvalid(String email) {
         Specification.installSpecification(
                 Specification.requestSpec("auth/candidate"),
@@ -72,24 +49,24 @@ public class AuthenticationTest {
         );
 
         CandidateRegistration candidate = CandidateRegistration.builder()
-                .email("tests@@gmaill.com")
+                .email(email)
                 .password(CORRECT_PASSWORD_SIZE)
                 .build();
 
-        ErrorResponse errorResponse = given()
+        given()
                 .body(candidate)
                 .when()
                 .post()
-                .then().log().all()
-                .extract().as(ErrorResponse.class);
-
-        assertEquals(400, errorResponse.getStatus());
-        assertEquals("Bad Request", errorResponse.getErrorCode());
-        assertEquals("Неверный формат email", errorResponse.getMessage());
+                .then()
+                .statusCode(400)
+                .log().ifValidationFails()
+                .body("status", equalTo(400))
+                .body("errorCode", equalTo("Bad Request"))
+                .body("message", equalTo("email: Неверный формат email"));
     }
 
     @Test
-    @DisplayName("Ошибка регистрации длина пароля меньше 8 символов")
+    @DisplayName("Кандидат: невреная длина пароля (400)")
     public void shouldReturn400WhenPasswordLengthInvalid() {
         Specification.installSpecification(
                 Specification.requestSpec("auth/candidate"),
@@ -97,20 +74,20 @@ public class AuthenticationTest {
         );
 
         CandidateRegistration candidate = CandidateRegistration.builder()
-                .email(DataGeneration.generateEmail())
+                .email(TestDataFactory.uniqueEmail())
                 .password(NOT_CORRECT_PASSWORD_SIZE)
                 .build();
 
-        ErrorResponse errorResponse = given()
+        given()
                 .body(candidate)
                 .when()
                 .post()
-                .then().log().all()
-                .extract().as(ErrorResponse.class);
-
-        assertEquals(400, errorResponse.getStatus());
-        assertEquals("Bad Request", errorResponse.getErrorCode());
-        assertEquals("Пароль должен быть минимум 8 символов", errorResponse.getMessage());
+                .then()
+                .statusCode(400)
+                .log().ifValidationFails()
+                .body("status", equalTo(400))
+                .body("errorCode", equalTo("Bad Request"))
+                .body("message", equalTo("Пароль должен быть минимум 8 символов"));
     }
 
     @Test
