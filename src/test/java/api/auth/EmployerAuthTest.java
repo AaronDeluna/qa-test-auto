@@ -18,6 +18,11 @@ public class EmployerAuthTest extends BaseApiTest {
     private static final String CORRECT_PASSWORD_SIZE = "12345678";
     private static final String NOT_CORRECT_PASSWORD_SIZE = "1234";
 
+    /**
+     * Тест: Успешная регистрация раотодателя
+     * 1. Проверка с валидными данными (email, пароль более 8 симв., имя, телефон).
+     * 2. Возвращается 201 (Created) и accessToken - refreshToken.
+     */
     @Test
     @DisplayName("Успешная регистрация работодателя (201)")
     public void successEmployerRegistration() {

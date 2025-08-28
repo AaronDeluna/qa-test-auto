@@ -5,12 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2432cf90-bc1a-47e8-ad66-efe7210d9ad5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/test/java/api/auth/CandidateAuthTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/api/auth/EmployerAuthTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/common/BaseApiTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/api/auth/AuthenticationTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/utils/DataGeneration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/data/TestDataFactory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/api/auth/EmployerAuthTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/api/auth/EmployerAuthTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -168,7 +163,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1755359847810</updated>
-      <workItem from="1755359849445" duration="34425000" />
+      <workItem from="1755359849445" duration="34747000" />
     </task>
     <servers />
   </component>
