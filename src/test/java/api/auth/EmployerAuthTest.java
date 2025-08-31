@@ -72,7 +72,7 @@ public class EmployerAuthTest extends BaseApiTest {
                     .then()
                     .spec(spec400())
                     .assertThat()
-                    .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("ErrorResponseSchema.json"));
+                    .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/error.json"));
         });
     }
 
@@ -91,7 +91,7 @@ public class EmployerAuthTest extends BaseApiTest {
                     .then()
                     .spec(spec400())
                     .assertThat()
-                    .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("ErrorResponseSchema.json"));
+                    .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/error.json"));
         });
     }
 
@@ -110,7 +110,7 @@ public class EmployerAuthTest extends BaseApiTest {
                     .then()
                     .spec(spec400())
                     .assertThat()
-                    .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("ErrorResponseSchema.json"));
+                    .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/error.json"));
         });
     }
 
@@ -131,7 +131,7 @@ public class EmployerAuthTest extends BaseApiTest {
                     .then()
                     .spec(spec409())
                     .assertThat()
-                    .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("ErrorResponseSchema.json"));
+                    .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("schemas/error.json"));
         });
     }
 

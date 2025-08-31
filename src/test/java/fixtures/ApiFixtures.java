@@ -5,14 +5,18 @@ import data.TestDataFactory;
 import dto.CandidateRegistration;
 import dto.EmployerRegistrationRequestDto;
 
+import static data.TestDataFactory.generatePassword;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 
 public class ApiFixtures {
 
-    public static String createCandidateExists() {
-        CandidateRegistration candidate = TestDataFactory.validCandidate();
+    public static String ensureCandidateExists(String email) {
+        CandidateRegistration candidate = CandidateRegistration.builder()
+                .email(email)
+                .password(generatePassword())
+                .build();
 
         given()
                 .spec(Specification.specAuthCandidate())
@@ -39,8 +43,8 @@ public class ApiFixtures {
         return employer.getEmail();
     }
 
-    public static String createUniqueCandidate(String password) {
-        CandidateRegistration candidate = TestDataFactory.validCandidate(password);
+    public static String createUniqueCandidate() {
+        CandidateRegistration candidate = TestDataFactory.validCandidate();
 
         given()
                 .spec(Specification.specAuthCandidate())
