@@ -1,0 +1,31 @@
+<div>POST to http://localhost:8080/api/auth/employer</div>
+
+    <h4>Body</h4>
+    <div>
+    <pre class="preformated-text">
+{
+    &quot;email&quot;: &quot;tests@.com&quot;,
+    &quot;password&quot;: &quot;12345678&quot;,
+    &quot;name&quot;: &quot;Test name-39b25d82-db5b-4f1c-9622-868c2b29055b&quot;,
+    &quot;phone&quot;: &quot;+79889960443&quot;
+}    </pre>
+    </div>
+
+    <h4>Headers</h4>
+    <div>
+            <div>Accept: */*</div>
+            <div>Content-Type: application/json</div>
+    </div>
+
+
+
+    <h4>Curl</h4>
+    <div>
+        curl -v -X POST &#39;http://localhost:8080/api/auth/employer&#39; -H &#39;Accept: */*&#39; -H &#39;Content-Type: application/json&#39; -d &#39;{
+    &quot;email&quot;: &quot;tests@.com&quot;,
+    &quot;password&quot;: &quot;12345678&quot;,
+    &quot;name&quot;: &quot;Test name-39b25d82-db5b-4f1c-9622-868c2b29055b&quot;,
+    &quot;phone&quot;: &quot;+79889960443&quot;
+}&#39;
+    </div>
+

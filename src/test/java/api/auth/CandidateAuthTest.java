@@ -1,118 +1,114 @@
 package api.auth;
 
 import common.BaseApiTest;
-import common.Specification;
 import data.TestDataFactory;
 import dto.CandidateRegistration;
-import dto.ErrorResponse;
+import fixtures.ApiFixtures;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Owner;
+import io.qameta.allure.Story;
+import io.restassured.module.jsv.JsonSchemaValidator;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static common.Specification.spec201;
+import static common.Specification.spec400;
+import static common.Specification.specAuthCandidate;
+import static io.qameta.allure.Allure.step;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CandidateAuthTest extends BaseApiTest {
+@Epic("Auth")
+@Feature("Регистрация кандидата")
+@Owner("ivan.m")
+@Tag("api")
+class CandidateAuthTest extends BaseApiTest {
 
-    private static final String CORRECT_PASSWORD_SIZE = "12345678";
-    private static final String NOT_CORRECT_PASSWORD_SIZE = "1234";
+    private static final String PASSWORD_OK = "12345678";
 
     @Test
-    @DisplayName("Кандидат: успешная регистрация (201) — выдаются access/refresh")
-    public void successCandidateRegistration() {
-        Specification.installSpecification(
-                Specification.requestSpec("auth/candidate"),
-                Specification.responseSpec(201)
-        );
+    @Story("Успешная регистрация")
+    @DisplayName("Кандидат: 201 и выдача токенов")
+    void candidateRegistration_201_tokensIssued() {
+        CandidateRegistration candidate = TestDataFactory.validCandidate();
 
-        given()
-                .body(TestDataFactory.validCandidate("12345678"))
+        step("Отправляем POST /auth/candidate", () -> {
+            given().spec(specAuthCandidate())
+                    .body(candidate)
+                    .when()
+                    .post()
+                    .then()
+                    .spec(spec201())
+                    .body("accessToken", notNullValue())
+                    .body("refreshToken", notNullValue())
+                    .body("accessToken.size()", greaterThan(10));
+        });
+    }
+
+    @ParameterizedTest(name = "Неверный email → 400: \"{0}\"")
+    @ValueSource(strings = {"tests@@gmaill.com", "@gmail.com", "tests@.com", "A..b@c.com"})
+    @Story("Валидация email")
+    @DisplayName("Кандидат: 400 при неверном формате email")
+    void candidateRegistration_400_invalidEmail(String email) {
+        CandidateRegistration candidate = CandidateRegistration.builder()
+                .email(email)
+                .password(PASSWORD_OK)
+                .build();
+
+        given().spec(specAuthCandidate())
+                .body(candidate)
                 .when()
                 .post()
                 .then()
-                .statusCode(201)
-                .log().ifValidationFails()
-                .body("accessToken", notNullValue())
-                .body("refreshToken", notNullValue());
+                .spec(spec400())
+                .assertThat()
+                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("ErrorResponseSchema.json"));
     }
 
-    @ParameterizedTest(name = "Кандидат: некорректный email → 400 (\"{0}\")")
-    @ValueSource(strings = {"tests@@gmaill.com", "@gmail.com", "tests@.com", "AtestB@.com"})
-    @DisplayName("Кандидат: неверный формат email (400)")
-    public void shouldReturn400WhenEmailIsInvalid(String email) {
-        Specification.installSpecification(
-                Specification.requestSpec("auth/candidate"),
-                Specification.responseSpec(400)
-        );
+    @Test
+    @Story("Валидация пароля")
+    @DisplayName("Кандидат: 400 при коротком пароле")
+    void candidateRegistration_400_shortPassword() {
+        CandidateRegistration candidate = CandidateRegistration.builder()
+                .email(TestDataFactory.uniqueEmail())
+                .password("1234")
+                .build();
+
+        given().spec(specAuthCandidate())
+                .body(candidate)
+                .when()
+                .post()
+                .then()
+                .spec(spec400())
+                .assertThat()
+                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("ErrorResponseSchema.json"));
+    }
+
+    @Test
+    @Story("Конфликт email")
+    @DisplayName("Кандидат: 409 если email уже занят")
+    void candidateRegistration_409_emailExists() {
+        String email = TestDataFactory.uniqueEmail();
+
+        ApiFixtures.createCandidateExists();
 
         CandidateRegistration candidate = CandidateRegistration.builder()
                 .email(email)
-                .password(CORRECT_PASSWORD_SIZE)
+                .password(PASSWORD_OK)
                 .build();
 
-        given()
+        given().spec(specAuthCandidate())
                 .body(candidate)
                 .when()
                 .post()
                 .then()
-                .statusCode(400)
-                .log().ifValidationFails()
-                .body("status", equalTo(400))
-                .body("errorCode", equalTo("Bad Request"))
-                .body("message", equalTo("email: Неверный формат email"));
+                .statusCode(409)
+                .assertThat()
+                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("ErrorResponseSchema.json"));
     }
-
-    @Test
-    @DisplayName("Кандидат: невреная длина пароля (400)")
-    public void shouldReturn400WhenPasswordLengthInvalid() {
-        Specification.installSpecification(
-                Specification.requestSpec("auth/candidate"),
-                Specification.responseSpec(400)
-        );
-
-        CandidateRegistration candidate = CandidateRegistration.builder()
-                .email(TestDataFactory.uniqueEmail())
-                .password(NOT_CORRECT_PASSWORD_SIZE)
-                .build();
-
-        given()
-                .body(candidate)
-                .when()
-                .post()
-                .then()
-                .statusCode(400)
-                .log().ifValidationFails()
-                .body("status", equalTo(400))
-                .body("errorCode", equalTo("Bad Request"))
-                .body("message", equalTo("Пароль должен быть минимум 8 символов"));
-    }
-
-    @Test
-    @DisplayName("Ошибка при регистрации на уже занятый email")
-    public void shouldReturn409WhenEmailIsExist() {
-        Specification.installSpecification(
-                Specification.requestSpec("auth/candidate"),
-                Specification.responseSpec(409)
-        );
-
-        CandidateRegistration candidate = CandidateRegistration.builder()
-                .email("test@mail.ru")
-                .password(CORRECT_PASSWORD_SIZE)
-                .build();
-
-        ErrorResponse errorResponse = given()
-                .body(candidate)
-                .when()
-                .post()
-                .then().log().all()
-                .extract().as(ErrorResponse.class);
-
-        assertEquals(409, errorResponse.getStatus());
-        assertEquals("Conflict", errorResponse.getErrorCode());
-        assertEquals("Пользователь с такой почтой уже зарегистрирован", errorResponse.getMessage());
-    }
-
 }

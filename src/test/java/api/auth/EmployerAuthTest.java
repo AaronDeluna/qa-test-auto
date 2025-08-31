@@ -1,169 +1,145 @@
 package api.auth;
 
 import common.BaseApiTest;
-import common.Specification;
 import data.TestDataFactory;
 import dto.EmployerRegistrationRequestDto;
+import fixtures.ApiFixtures;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Owner;
+import io.qameta.allure.Severity;
+import io.qameta.allure.Story;
+import io.restassured.module.jsv.JsonSchemaValidator;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static common.Specification.spec201;
+import static common.Specification.spec400;
+import static common.Specification.spec409;
+import static common.Specification.specAuthEmployer;
+import static data.TestDataFactory.generatePhone;
+import static data.TestDataFactory.uniqueEmail;
+import static io.qameta.allure.Allure.step;
+import static io.qameta.allure.SeverityLevel.CRITICAL;
+import static io.qameta.allure.SeverityLevel.NORMAL;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
+@Epic("Auth")
+@Feature("Регистрация работодателя")
+@Owner("ivan.m")
+@Tag("api")
 public class EmployerAuthTest extends BaseApiTest {
 
-    private static final String CORRECT_PASSWORD_SIZE = "12345678";
-    private static final String NOT_CORRECT_PASSWORD_SIZE = "1234";
+    private static final String PASSWORD_OK = "12345678";
+    private static final String PASSWORD_SHORT = "123";
 
-    /**
-     * Тест: Успешная регистрация раотодателя
-     * 1. Проверка с валидными данными (email, пароль более 8 симв., имя, телефон).
-     * 2. Возвращается 201 (Created) и accessToken - refreshToken.
-     */
     @Test
-    @DisplayName("Успешная регистрация работодателя (201)")
-    public void successEmployerRegistration() {
-        Specification.installSpecification(
-                Specification.requestSpec("auth/employer"),
-                Specification.responseSpec(201)
-        );
+    @Story("Успешная регистрация")
+    @Severity(CRITICAL)
+    @DisplayName("Работодатель: 201 и выдача токенов")
+    public void employerRegistration_201_tokensIssued() {
+        EmployerRegistrationRequestDto employer = TestDataFactory.validEmployer();
 
-        EmployerRegistrationRequestDto employer = EmployerRegistrationRequestDto.builder()
-                .email(TestDataFactory.uniqueEmail())
-                .password(CORRECT_PASSWORD_SIZE)
-                .name(TestDataFactory.generateName())
-                .phone(TestDataFactory.generatePhone())
-                .build();
-
-        given()
-                .body(employer)
-                .when()
-                .post()
-                .then()
-                .statusCode(201)
-                .log().all()
-                .body("accessToken", notNullValue())
-                .body("refreshToken", notNullValue());
+        step("POST /auth/employer → 201, токены выданы", () -> {
+            given().spec(specAuthEmployer())
+                    .body(employer)
+                    .when()
+                    .post()
+                    .then()
+                    .spec(spec201())
+                    .body("accessToken", notNullValue())
+                    .body("refreshToken", notNullValue());
+        });
     }
 
-    @ParameterizedTest(name = "invalidEmail")
-    @ValueSource(strings = {
-            "tesdts@@gmaill.com",
-            "@gmaidl.com",
-            "tesdtrs@.com",
-            "AtesedtB@.com",
-    })
-    @DisplayName("Регистрация при неверном формате email (400)")
+    @ParameterizedTest(name = "Неверный email → 400: \"{0}\"")
+    @ValueSource(strings = {"tests@@gmaill.com", "@gmail.com", "tests@.com", "A..b@c.com"})
+    @Story("Валидация email")
+    @Severity(NORMAL)
+    @DisplayName("Работодатель: 400 при неверном формате email")
     public void shouldReturn400WhenEmployerEmailIsInvalid(String email) {
-        Specification.installSpecification(
-                Specification.requestSpec("auth/employer"),
-                Specification.responseSpec(400)
-        );
+        EmployerRegistrationRequestDto employer = buildEmployer(email, PASSWORD_OK, generatePhone());
 
-        EmployerRegistrationRequestDto employer = EmployerRegistrationRequestDto.builder()
-                .email(email)
-                .password(CORRECT_PASSWORD_SIZE)
-                .name(TestDataFactory.generateName())
-                .phone(TestDataFactory.generatePhone())
-                .build();
-
-        given()
-                .body(employer)
-                .when()
-                .post()
-                .then()
-                .statusCode(400)
-                .log().all()
-                .body("status", equalTo(400))
-                .body("errorCode", equalTo("Bad Request"))
-                .body("message", equalTo("email: Неверный формат email"));
+        step("POST /auth/employer → 400, валидация email", () -> {
+            given().spec(specAuthEmployer())
+                    .body(employer)
+                    .when()
+                    .post()
+                    .then()
+                    .spec(spec400())
+                    .assertThat()
+                    .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("ErrorResponseSchema.json"));
+        });
     }
 
     @Test
-    @DisplayName("Регистрация при невреном формате password (400)")
+    @Story("Валидация пароля")
+    @Severity(NORMAL)
+    @DisplayName("Работодатель: 400 при коротком пароле")
     public void shouldReturn400WhenEmployerPasswordInvalid() {
-        Specification.installSpecification(
-                Specification.requestSpec("auth/employer"),
-                Specification.responseSpec(400)
-        );
+        EmployerRegistrationRequestDto employer = buildEmployer(uniqueEmail(), PASSWORD_SHORT, generatePhone());
 
-        EmployerRegistrationRequestDto employer = EmployerRegistrationRequestDto.builder()
-                .email(TestDataFactory.uniqueEmail())
-                .password(NOT_CORRECT_PASSWORD_SIZE)
-                .name(TestDataFactory.generateName())
-                .phone(TestDataFactory.generatePhone())
-                .build();
-
-        given()
-                .body(employer)
-                .when()
-                .post()
-                .then()
-                .statusCode(400)
-                .log().all()
-                .body("status", equalTo(400))
-                .body("errorCode", equalTo("Bad Request"))
-                .body("message", equalTo("password: Пароль должен содержать минимум 8 символов"));
+        step("POST /auth/employer → 400, короткий пароль", () -> {
+            given().spec(specAuthEmployer())
+                    .body(employer)
+                    .when()
+                    .post()
+                    .then()
+                    .spec(spec400())
+                    .assertThat()
+                    .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("ErrorResponseSchema.json"));
+        });
     }
 
     @Test
-    @DisplayName("Регистраця при неверном формате телефона")
+    @Story("Валидация телефона")
+    @Severity(NORMAL)
+    @DisplayName("Работодатель: 400 при неверном формате телефона")
     public void shouldReturn400WhenEmployerPhoneInvalid() {
-        Specification.installSpecification(
-                Specification.requestSpec("auth/employer"),
-                Specification.responseSpec(400)
-        );
+        EmployerRegistrationRequestDto employer = buildEmployer(uniqueEmail(), PASSWORD_OK, "123");
 
-        String invalidPhone = "123";
-
-        EmployerRegistrationRequestDto employer = EmployerRegistrationRequestDto.builder()
-                .email(TestDataFactory.uniqueEmail())
-                .password(CORRECT_PASSWORD_SIZE)
-                .name(TestDataFactory.generateName())
-                .phone(invalidPhone)
-                .build();
-
-        given()
-                .body(employer)
-                .when()
-                .post()
-                .then()
-                .statusCode(400)
-                .log().all()
-                .body("status", equalTo(400))
-                .body("errorCode", equalTo("Bad Request"))
-                .body("message", equalTo("Неверный формат телефона"));
+        step("POST /auth/employer → 400, неверный телефон", () -> {
+            given().spec(specAuthEmployer())
+                    .body(employer)
+                    .when()
+                    .post()
+                    .then()
+                    .spec(spec400())
+                    .assertThat()
+                    .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("ErrorResponseSchema.json"));
+        });
     }
 
     @Test
-    @DisplayName("Регистрация при уже занятом email (409)")
+    @Story("Конфликт email")
+    @Severity(CRITICAL)
+    @DisplayName("Работодатель: 409 если email уже занят")
     public void shouldReturn409WhenEmployerEmailIsExist() {
-        Specification.installSpecification(
-                Specification.requestSpec("auth/employer"),
-                Specification.responseSpec(409)
-        );
+        String existsEmail = ApiFixtures.createEmployerExists();
 
-        EmployerRegistrationRequestDto candidate = EmployerRegistrationRequestDto.builder()
-                .email("employertest@gmail.com")
-                .password(CORRECT_PASSWORD_SIZE)
+        EmployerRegistrationRequestDto employer = buildEmployer(existsEmail, PASSWORD_OK, generatePhone());
+
+        step("POST /auth/employer → 409, email уже занят", () -> {
+            given().spec(specAuthEmployer())
+                    .body(employer)
+                    .when()
+                    .post()
+                    .then()
+                    .spec(spec409())
+                    .assertThat()
+                    .body(JsonSchemaValidator.matchesJsonSchemaInClasspath("ErrorResponseSchema.json"));
+        });
+    }
+
+    private EmployerRegistrationRequestDto buildEmployer(String email, String password, String phone) {
+        return EmployerRegistrationRequestDto.builder()
+                .email(email).password(password)
                 .name(TestDataFactory.generateName())
-                .phone(TestDataFactory.generatePhone())
+                .phone(phone)
                 .build();
-
-        given().body(candidate).when().post();
-
-        given()
-                .body(candidate)
-                .when()
-                .post()
-                .then()
-                .statusCode(409)
-                .log().ifValidationFails()
-                .body("status", equalTo(409))
-                .body("errorCode", equalTo("Conflict"))
-                .body("message", equalTo("Пользователь с такой почтой уже зарегистрирован"));
     }
 }

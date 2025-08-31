@@ -11,9 +11,6 @@ import org.junit.jupiter.api.BeforeAll;
 
 public abstract class BaseApiTest {
 
-    private static final String CORRECT_PASSWORD_SIZE = "12345678";
-    private static final String NOT_CORRECT_PASSWORD_SIZE = "1234";
-
     protected static String BASE_URL;
     protected static RequestSpecification JSON_SPEC;
 
